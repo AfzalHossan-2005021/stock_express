@@ -20,7 +20,6 @@ jest.setTimeout(30000)
 // Global test setup
 beforeAll(async () => {
   // Set default timeout
-  jest.setTimeout(30000)
 }, 30000)
 
 // Global test teardown
