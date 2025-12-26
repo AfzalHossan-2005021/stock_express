@@ -197,7 +197,7 @@ const TestUserSchema = new Schema({
 1. Verify MONGODB_URI format: `mongodb+srv://user:pass@cluster.db.mongodb.net/database`
 2. Ensure special characters in password are URL-encoded (`#` → `%23`)
 3. Check MongoDB Atlas cluster is running
-4. Verify IP whitelist includes your machine (or use 0.0.0.0/0)
+4. Verify the MongoDB Atlas IP access list includes your machine's current public IP (or a restricted corporate/VPN range). Avoid using `0.0.0.0/0`, even for testing, as it exposes the database to the entire internet.
 
 ### Authentication Failed
 **Problem:** "authentication failed" or "Invalid username or password"
