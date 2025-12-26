@@ -148,7 +148,7 @@ process.env.NODE_ENV = 'test';
 The connection is managed in `database/mongoose.ts` with caching:
 
 ```typescript
-export const connctToDatabase = async () => {
+export const connectToDatabase = async () => {
   if (cached.conn) return cached.conn; // Return cached connection
   
   // Create new connection if not cached
@@ -229,13 +229,13 @@ const TestUserSchema = new Schema({
 
 ### Example Test
 ```typescript
-import { connctToDatabase } from '../mongoose'
+import { connectToDatabase } from '../mongoose'
 
 describe('My Feature Tests', () => {
   jest.setTimeout(90000)
   
   beforeAll(async () => {
-    await connctToDatabase()
+    await connectToDatabase()
   })
   
   afterAll(async () => {
