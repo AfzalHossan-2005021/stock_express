@@ -15,7 +15,7 @@ if (!cached) {
   cached = global.mongooseCache = { conn: null, promise: null };
 }
 
-export const connctToDatabase = async () => {
+export const connectToDatabase = async () => {
   if(!MONGODB_URI) {
     throw new Error('Please define the MONGODB_URI environment variable inside .env.local');
   }
