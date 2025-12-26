@@ -51,7 +51,7 @@ export const signOut = async () => {
 
 export const signInWithEmail = async ({ email, password }: SignInFormData) => {
   try {
-    const response = await auth.api.signInEmail({
+    await auth.api.signInEmail({
       body: {email, password}
     })
 
