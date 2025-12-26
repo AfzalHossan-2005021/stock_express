@@ -4,7 +4,7 @@
  */
 
 import mongoose, { Schema, Document } from 'mongoose'
-import { connctToDatabase } from '../mongoose'
+import { connectToDatabase } from '../mongoose'
 
 // Test model
 interface TestUser extends Document {
@@ -17,7 +17,7 @@ let TestUserModel: mongoose.Model<TestUser>
 
 describe('Database Operations Tests', () => {
   beforeAll(async () => {
-    await connctToDatabase()
+    await connectToDatabase()
 
     // Define test schema
     const testSchema = new Schema<TestUser>({

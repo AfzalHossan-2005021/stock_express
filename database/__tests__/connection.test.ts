@@ -4,7 +4,7 @@
  */
 
 import mongoose from 'mongoose'
-import { connctToDatabase } from '../mongoose'
+import { connectToDatabase } from '../mongoose'
 
 jest.setTimeout(90000) // Set global timeout for all tests in this suite
 
@@ -14,7 +14,7 @@ describe('Database Connection Tests', () => {
 
   beforeAll(async () => {
     if (!isConnected) {
-      await connctToDatabase()
+      await connectToDatabase()
       isConnected = true
     }
   })
