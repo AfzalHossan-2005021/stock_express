@@ -23,9 +23,9 @@ export { fetchJSON };
 export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> {
   try {
     const range = getDateRange(5);
-    const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY;
+    const token = process.env.FINNHUB_API_KEY;
     if (!token) {
-      throw new Error('FINNHUB API key is not configured');
+      throw new Error('FINNHUB_API_KEY environment variable is not configured');
     }
     const cleanSymbols = (symbols || [])
       .map((s) => s?.trim().toUpperCase())
@@ -42,7 +42,9 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
           try {
             const url = `${FINNHUB_BASE_URL}/company-news?symbol=${encodeURIComponent(sym)}&from=${range.from}&to=${range.to}&token=${token}`;
             const articles = await fetchJSON<RawNewsArticle[]>(url, 300);
-            perSymbolArticles[sym] = (articles || []).filter(validateArticle);
+            perSymbolArticles[sym] = (articles || [])
+              .filter(validateArticle)
+              .sort((a, b) => (b.datetime || 0) - (a.datetime || 0));
           } catch (e) {
             console.error('Error fetching company news for', sym, e);
             perSymbolArticles[sym] = [];
@@ -51,13 +53,23 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
       );
 
       const collected: MarketNewsArticle[] = [];
+      const symbolIndices: Record<string, number> = {};
+      
+      // Initialize indices for each symbol
+      cleanSymbols.forEach(sym => symbolIndices[sym] = 0);
+      
       // Round-robin up to 6 picks
       for (let round = 0; round < maxArticles; round++) {
         for (let i = 0; i < cleanSymbols.length; i++) {
           const sym = cleanSymbols[i];
           const list = perSymbolArticles[sym] || [];
-          if (list.length === 0) continue;
-          const article = list.shift();
+          const currentIndex = symbolIndices[sym];
+          
+          if (currentIndex >= list.length) continue;
+          
+          const article = list[currentIndex];
+          symbolIndices[sym]++;
+          
           if (!article || !validateArticle(article)) continue;
           collected.push(formatArticle(article, true, sym, round));
           if (collected.length >= maxArticles) break;
@@ -66,11 +78,9 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
       }
 
       if (collected.length > 0) {
-        // Sort by datetime desc
-        collected.sort((a, b) => (b.datetime || 0) - (a.datetime || 0));
         return collected.slice(0, maxArticles);
       }
-      // If none collected, fall through to general news
+      console.warn('No articles found for symbols:', cleanSymbols, '- falling back to general news');
     }
 
     // General market news fallback or when no symbols provided
@@ -85,7 +95,7 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
       if (seen.has(key)) continue;
       seen.add(key);
       unique.push(art);
-      if (unique.length >= 20) break; // cap early before final slicing
+      if (unique.length >= maxArticles) break; // cap early before final slicing
     }
 
     const formatted = unique.slice(0, maxArticles).map((a, idx) => formatArticle(a, false, undefined, idx));
