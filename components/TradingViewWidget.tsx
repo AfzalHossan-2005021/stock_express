@@ -5,14 +5,14 @@ import { cn } from '@/lib/utils';
 import useTradingViewWidget from '@/hooks/useTradingViewWidget';
 
 interface TradingViewWidgetProps {
-  title: string;
+  title: string | null;
   scriptUrl: string;
   config: Record<string, unknown>;
   height?: number;
   className?: string;
 }
 
-const TradingViewWidget = ({ title, scriptUrl, config, height = 600, className }: TradingViewWidgetProps) => {
+const TradingViewWidget = ({ title = null, scriptUrl, config, height = 600, className }: TradingViewWidgetProps) => {
   const container = useTradingViewWidget(scriptUrl, config, height);
 
   return (
