@@ -81,28 +81,30 @@ export const sendDailyNewsSummary = inngest.createFunction(
     });
 
     // Step #3: (placeholder) Summarize news via AI
-    const userNewsSummaries: { user: User; newsContent: string | null }[] = [];
+    const userNewsSummaries = await step.run('summarize-all-news', async () => {
+      const summaries: { user: User; newsContent: string | null }[] = [];
+      for (const { user, articles } of results) {
+        try {
+          const prompt = NEWS_SUMMARY_EMAIL_PROMPT.replace('{{newsData}}', JSON.stringify(articles, null, 2));
 
-    for (const { user, articles } of results) {
-      try {
-        const prompt = NEWS_SUMMARY_EMAIL_PROMPT.replace('{{newsData}}', JSON.stringify(articles, null, 2));
+          const response = await step.ai.infer(`summarize-news-${user.email}`, {
+            model: step.ai.models.gemini({ model: 'gemini-2.5-flash-lite' }),
+            body: {
+              contents: [{ role: 'user', parts: [{ text: prompt }] }]
+            }
+          });
 
-        const response = await step.ai.infer(`summarize-news-${user.email}`, {
-          model: step.ai.models.gemini({ model: 'gemini-2.5-flash-lite' }),
-          body: {
-            contents: [{ role: 'user', parts: [{ text: prompt }] }]
-          }
-        });
+          const part = response.candidates?.[0]?.content?.parts?.[0];
+          const newsContent = (part && 'text' in part ? part.text : null) || 'No market news.'
 
-        const part = response.candidates?.[0]?.content?.parts?.[0];
-        const newsContent = (part && 'text' in part ? part.text : null) || 'No market news.'
-
-        userNewsSummaries.push({ user, newsContent });
-      } catch (e) {
-        console.error('Failed to summarize news for : ', user.email);
-        userNewsSummaries.push({ user, newsContent: null });
+          summaries.push({ user, newsContent });
+        } catch (e) {
+          console.error('Failed to summarize news for : ', user.email);
+          summaries.push({ user, newsContent: null });
+        }
       }
-    }
+      return summaries;
+    });
 
     // Step #4: (placeholder) Send the emails
     await step.run('send-news-emails', async () => {
