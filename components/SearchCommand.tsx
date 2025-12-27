@@ -9,9 +9,11 @@ import {
 } from '@/components/ui/command';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Loader2, TrendingUp } from 'lucide-react';
+import { Loader2, TrendingUp, Star } from 'lucide-react';
 import { searchStocks } from '@/lib/actions/finnhub.actions';
+import { addToWatchlist, removeFromWatchlist } from '@/lib/actions/watchlist.actions';
 import { useDebounce } from '@/hooks/useDebounce';
+import { toast } from 'sonner';
 
 export const SearchCommand = ({ renderAs = 'button', label = 'Add stock', initialStocks }: SearchCommandProps) => {
   const [open, setOpen] = useState(false);
@@ -58,6 +60,41 @@ export const SearchCommand = ({ renderAs = 'button', label = 'Add stock', initia
     setOpen(false);
     setSearchTerm('');
     setStocks(initialStocks);
+  };
+
+  const handleToggleWatchlist = async (
+    e: React.MouseEvent<HTMLButtonElement>,
+    stock: StockWithWatchlistStatus
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      if (stock.isInWatchlist) {
+        await removeFromWatchlist(stock.symbol);
+        setStocks((prev) =>
+          prev.map((s) =>
+            s.symbol === stock.symbol ? { ...s, isInWatchlist: false } : s
+          )
+        );
+        toast.success(`${stock.symbol} removed from watchlist`);
+      } else {
+        await addToWatchlist(stock.symbol, stock.name);
+        setStocks((prev) =>
+          prev.map((s) =>
+            s.symbol === stock.symbol ? { ...s, isInWatchlist: true } : s
+          )
+        );
+        toast.success(`${stock.symbol} added to watchlist`);
+      }
+    } catch (error) {
+      console.error('Error toggling watchlist:', error);
+      toast.error(
+        stock.isInWatchlist
+          ? `Failed to remove ${stock.symbol}`
+          : `Failed to add ${stock.symbol}`
+      );
+    }
   };
 
   return (
@@ -110,7 +147,16 @@ export const SearchCommand = ({ renderAs = 'button', label = 'Add stock', initia
                         {stock.symbol} | {stock.exchange} | {stock.type}
                       </div>
                     </div>
-                    {/* <Star /> */}
+                    <button
+                      onClick={(e) => handleToggleWatchlist(e, stock)}
+                      className='p-2 text-yellow-500 hover:bg-yellow-500/10 rounded transition-colors'
+                      title={stock.isInWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
+                    >
+                      <Star
+                        size={18}
+                        fill={stock.isInWatchlist ? 'currentColor' : 'none'}
+                      />
+                    </button>
                   </Link>
                 </li>
               ))}
