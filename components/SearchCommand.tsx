@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import { Loader2, TrendingUp, Star } from 'lucide-react';
 import { searchStocks } from '@/lib/actions/finnhub.actions';
-import { addToWatchlist, removeFromWatchlist } from '@/lib/actions/watchlist.actions';
+import { addToWatchlist, removeFromWatchlist, isInWatchlist } from '@/lib/actions/watchlist.actions';
 import { useDebounce } from '@/hooks/useDebounce';
 import { toast } from 'sonner';
 
@@ -36,12 +36,41 @@ export const SearchCommand = ({ renderAs = 'button', label = 'Add stock', initia
     return () => document.removeEventListener('keydown', down);
   }, []);
 
+  // Check watchlist status for initial stocks
+  useEffect(() => {
+    const checkWatchlistStatus = async () => {
+      try {
+        const updatedStocks = await Promise.all(
+          initialStocks.map(async (stock) => {
+            const inWatchlist = await isInWatchlist(stock.symbol);
+            return { ...stock, isInWatchlist: inWatchlist };
+          })
+        );
+        setStocks(updatedStocks);
+      } catch (error) {
+        console.error('Error checking watchlist status:', error);
+        setStocks(initialStocks);
+      }
+    };
+
+    if (initialStocks.length > 0) {
+      checkWatchlistStatus();
+    }
+  }, [initialStocks]);
+
   const handleSearch = async () => {
     if (!isSearchMode) return setStocks(initialStocks);
     setLoading(true);
     try {
       const results = await searchStocks(searchTerm);
-      setStocks(results);
+      // Check watchlist status for search results
+      const resultsWithStatus = await Promise.all(
+        results.map(async (stock) => {
+          const inWatchlist = await isInWatchlist(stock.symbol);
+          return { ...stock, isInWatchlist: inWatchlist };
+        })
+      );
+      setStocks(resultsWithStatus);
     } catch (error) {
       console.error('Error searching stocks:', error);
       setStocks([]);

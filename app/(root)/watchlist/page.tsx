@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Trash2 } from 'lucide-react';
 import { SearchCommand } from '@/components/SearchCommand';
+import TickerTape from '@/components/TickerTape';
 import { getWatchlistItems, removeFromWatchlist } from '@/lib/actions/watchlist.actions';
 import { searchStocks } from '@/lib/actions/finnhub.actions';
 import { toast } from 'sonner';
@@ -99,6 +100,12 @@ export default function WatchlistPage() {
         <h1 className="text-3xl font-bold text-gray-100 mb-2">Your Watchlist</h1>
         <p className="text-gray-400">Track your favorite stocks in one place</p>
       </div>
+
+      {items.length > 0 && (
+        <div className="rounded-lg border border-gray-700 bg-gray-900 overflow-hidden">
+          <TickerTape symbols={items.map((item) => item.symbol)} />
+        </div>
+      )}
 
       <div className="overflow-x-auto rounded-lg border border-gray-700">
         <table className="w-full">
