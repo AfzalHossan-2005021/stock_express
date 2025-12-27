@@ -3,6 +3,7 @@
 import { getDateRange, validateArticle, formatArticle } from '@/lib/utils';
 import { POPULAR_STOCK_SYMBOLS } from '../constants';
 import { cache } from 'react';
+import { mapFinnhubExchangeToTradingView } from '@/lib/tradingview';
 
 const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
 const NEXT_PUBLIC_FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? '';
@@ -21,6 +22,28 @@ async function fetchJSON<T>(url: string, revalidateSeconds?: number): Promise<T>
 }
 
 export { fetchJSON };
+
+export const getStockProfile2 = cache(async (symbol: string): Promise<{ name?: string; exchange?: string } | null> => {
+  try {
+    const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY;
+    if (!token) return null;
+
+    const clean = (symbol || '').trim().toUpperCase();
+    if (!clean) return null;
+
+    const url = `${FINNHUB_BASE_URL}/stock/profile2?symbol=${encodeURIComponent(clean)}&token=${token}`;
+    const profile = await fetchJSON<any>(url, 3600).catch(() => null);
+    if (!profile) return null;
+
+    return {
+      name: profile?.name || profile?.ticker || undefined,
+      exchange: profile?.exchange || undefined,
+    };
+  } catch (err) {
+    console.error('getStockProfile2 error:', err);
+    return null;
+  }
+});
 
 export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> {
   try {
@@ -121,6 +144,9 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
 
     let results: FinnhubSearchResult[] = [];
 
+    // For query-mode results, Finnhub search doesn't include enough exchange info to build TradingView symbols.
+    // We'll enrich with profile2 (cached) for up to 15 results.
+
     if (!trimmed) {
       // Fetch top 10 popular symbols' profiles
       const top = POPULAR_STOCK_SYMBOLS.slice(0, 10);
@@ -153,7 +179,7 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
           // We don't include exchange in FinnhubSearchResult type, so carry via mapping later using profile
           // To keep pipeline simple, attach exchange via closure map stage
           // We'll reconstruct exchange when mapping to final type
-          (r as any).__exchange = exchange; // internal only
+          (r as any).__exchange = exchange; // internal only (Finnhub exchange string)
           return r;
         })
         .filter((x): x is FinnhubSearchResult => Boolean(x));
@@ -163,23 +189,48 @@ export const searchStocks = cache(async (query?: string): Promise<StockWithWatch
       results = Array.isArray(data?.result) ? data.result : [];
     }
 
-    const mapped: StockWithWatchlistStatus[] = results
+    const uniqueSymbols = Array.from(
+      new Set(
+        (results || [])
+          .map((r) => (r?.symbol || '').trim().toUpperCase())
+          .filter((s) => Boolean(s))
+      )
+    ).slice(0, 15);
+
+    const profileBySymbol = new Map<string, { name?: string; exchange?: string }>();
+
+    // Only enrich when needed (query-mode); for popular mode we already have exchange in __exchange.
+    if (trimmed && uniqueSymbols.length > 0) {
+      await Promise.all(
+        uniqueSymbols.map(async (sym) => {
+          const profile = await getStockProfile2(sym);
+          if (profile) profileBySymbol.set(sym, profile);
+        })
+      );
+    }
+
+    const mapped: StockWithWatchlistStatus[] = (results || [])
       .map((r) => {
-        const upper = (r.symbol || '').toUpperCase();
-        const name = r.description || upper;
-        const exchangeFromDisplay = (r.displaySymbol as string | undefined) || undefined;
-        const exchangeFromProfile = (r as any).__exchange as string | undefined;
-        const exchange = exchangeFromDisplay || exchangeFromProfile || 'US';
-        const type = r.type || 'Stock';
+        const upper = (r?.symbol || '').trim().toUpperCase();
+        if (!upper) return undefined;
+
+        const profile = trimmed ? profileBySymbol.get(upper) : undefined;
+        const exchangeRaw = (r as any)?.__exchange as string | undefined;
+        const tvExchange = mapFinnhubExchangeToTradingView(profile?.exchange || exchangeRaw);
+
+        const name = r?.description || profile?.name || upper;
+        const type = r?.type || 'Stock';
+
         const item: StockWithWatchlistStatus = {
           symbol: upper,
           name,
-          exchange,
+          exchange: tvExchange || 'US',
           type,
           isInWatchlist: false,
         };
         return item;
       })
+      .filter((x): x is StockWithWatchlistStatus => Boolean(x))
       .slice(0, 15);
 
     return mapped;

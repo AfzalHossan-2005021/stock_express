@@ -108,7 +108,8 @@ export const SearchCommand = ({ renderAs = 'button', label = 'Add stock', initia
         );
         toast.success(`${stock.symbol} removed from watchlist`);
       } else {
-        await addToWatchlist(stock.symbol, stock.name);
+        const tvSymbol = stock.exchange && stock.exchange !== 'US' ? `${stock.exchange}:${stock.symbol}` : undefined;
+        await addToWatchlist(stock.symbol, stock.name, tvSymbol);
         setStocks((prev) =>
           prev.map((s) =>
             s.symbol === stock.symbol ? { ...s, isInWatchlist: true } : s

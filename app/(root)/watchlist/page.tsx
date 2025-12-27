@@ -103,7 +103,11 @@ export default function WatchlistPage() {
 
       {items.length > 0 && (
         <div className="rounded-lg border border-gray-700 bg-gray-900 overflow-hidden">
-          <TickerTape symbols={items.map((item) => item.symbol)} />
+          <TickerTape
+            symbols={items
+              .map((item) => (item.exchange && item.exchange !== 'US' ? `${item.exchange}:${item.symbol}` : null))
+              .filter((s): s is string => Boolean(s))}
+          />
         </div>
       )}
 

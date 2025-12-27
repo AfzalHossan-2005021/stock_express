@@ -11,35 +11,51 @@ const TickerTape = ({ symbols }: TickerTapeProps) => {
 
   useEffect(() => {
     if (!container.current) return;
-    if (symbols.length === 0) return;
+    const normalized = (symbols || [])
+      .map((s) => (s || '').trim().toUpperCase())
+      .filter((s) => Boolean(s) && s.includes(':'));
+
+    if (normalized.length === 0) {
+      container.current.innerHTML = '';
+      return;
+    }
 
     // Clear previous content
     container.current.innerHTML = '';
 
-    // Format symbols for TradingView (add NASDAQ: prefix if no prefix exists)
-    const formattedSymbols = symbols
-      .map((symbol) => {
-        // Add common exchange prefixes based on symbol patterns
-        if (symbol.includes(':')) {
-          return symbol; // Already has prefix
-        }
-        // Default to NASDAQ for most stocks
-        return `NASDAQ:${symbol}`;
-      })
-      .join(',');
+    const formattedSymbols = normalized.join(',');
 
-    // Create the ticker tape script
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.src = 'https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js';
-    script.async = true;
-
-    // Create the ticker tape element
     const tickerElement = document.createElement('tv-ticker-tape');
     tickerElement.setAttribute('symbols', formattedSymbols);
 
-    container.current.appendChild(tickerElement);
-    container.current.appendChild(script);
+    const SCRIPT_ID = 'tv-ticker-tape-script';
+    let script = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
+
+    const mount = () => {
+      if (!container.current) return;
+      container.current.innerHTML = '';
+      container.current.appendChild(tickerElement);
+    };
+
+    if (customElements.get('tv-ticker-tape')) {
+      mount();
+      return;
+    }
+
+    if (!script) {
+      script = document.createElement('script');
+      script.id = SCRIPT_ID;
+      script.type = 'module';
+      script.src = 'https://widgets.tradingview-widget.com/w/en/tv-ticker-tape.js';
+      script.async = true;
+      document.head.appendChild(script);
+    }
+
+    script.addEventListener('load', mount, { once: true });
+    script.addEventListener('error', () => {
+      // If the script fails to load, fail silently instead of crashing the page.
+      if (container.current) container.current.innerHTML = '';
+    }, { once: true });
 
     return () => {
       if (container.current) {
@@ -48,7 +64,7 @@ const TickerTape = ({ symbols }: TickerTapeProps) => {
     };
   }, [symbols]);
 
-  if (symbols.length === 0) {
+  if ((symbols || []).length === 0) {
     return null;
   }
 
