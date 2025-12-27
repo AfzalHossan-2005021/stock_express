@@ -44,5 +44,11 @@ export const sendNewsSummaryEmail = async (
         html: htmlTemplate,
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`News summary email sent to ${email} for date ${date}`);
+    } catch (error) {
+        console.error(`Error sending news summary email to ${email}:`, error);
+        throw error;
+    }
 };
