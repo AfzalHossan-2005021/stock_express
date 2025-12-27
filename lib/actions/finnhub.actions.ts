@@ -6,7 +6,7 @@ import { cache } from 'react';
 import { mapFinnhubExchangeToTradingView } from '@/lib/tradingview';
 
 const FINNHUB_BASE_URL = 'https://finnhub.io/api/v1';
-const NEXT_PUBLIC_FINNHUB_API_KEY = process.env.NEXT_PUBLIC_FINNHUB_API_KEY ?? '';
+const FINNHUB_API_KEY = process.env.FINNHUB_API_KEY ?? '';
 
 async function fetchJSON<T>(url: string, revalidateSeconds?: number): Promise<T> {
   const options: RequestInit & { next?: { revalidate?: number } } = revalidateSeconds
@@ -25,7 +25,7 @@ export { fetchJSON };
 
 export const getStockProfile2 = cache(async (symbol: string): Promise<{ name?: string; exchange?: string } | null> => {
   try {
-    const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY;
+    const token = process.env.FINNHUB_API_KEY ?? FINNHUB_API_KEY;
     if (!token) return null;
 
     const clean = (symbol || '').trim().toUpperCase();
@@ -133,7 +133,7 @@ export async function getNews(symbols?: string[]): Promise<MarketNewsArticle[]> 
 
 export const searchStocks = cache(async (query?: string): Promise<StockWithWatchlistStatus[]> => {
   try {
-    const token = process.env.FINNHUB_API_KEY ?? NEXT_PUBLIC_FINNHUB_API_KEY;
+    const token = process.env.FINNHUB_API_KEY ?? FINNHUB_API_KEY;
     if (!token) {
       // If no token, log and return empty to avoid throwing per requirements
       console.error('Error in stock search:', new Error('FINNHUB API key is not configured'));
