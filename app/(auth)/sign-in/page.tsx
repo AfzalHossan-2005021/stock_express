@@ -1,8 +1,8 @@
 'use client'
 
 import InputField from "@/components/forms/InputField"
+import LoadingButton from "@/components/forms/LoadingButton"
 import PasswordInputField from "@/components/forms/PasswordInputField"
-import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -55,9 +55,9 @@ const SignIn = () => {
           error={errors.password}
           validation={{ required: 'Password is required', minLength: { value: 6, message: 'Password must be at least 6 characters' } }}
         />
-        <Button type="submit" disabled={isSubmitting} className="yellow-btn w-full mt-5">
-          {isSubmitting ? 'Signing In' : 'Sign In'}
-        </Button>
+        <LoadingButton isLoading={isSubmitting} loadingText="Signing In..." className="yellow-btn w-full mt-5">
+          Sign In
+        </LoadingButton>
       </form>
       <div className="mt-6 text-center">
         <p className="text-gray-400">

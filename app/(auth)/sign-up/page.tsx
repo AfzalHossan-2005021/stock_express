@@ -4,10 +4,10 @@ import { useState } from 'react'
 import CountrySelectField from "@/components/forms/CountrySelectField"
 import FooterLink from "@/components/forms/FooterLink"
 import InputField from "@/components/forms/InputField"
+import LoadingButton from "@/components/forms/LoadingButton"
 import PasswordInputField from "@/components/forms/PasswordInputField"
 import PasswordStrengthIndicator from "@/components/forms/PasswordStrengthIndicator"
 import SelectField from "@/components/forms/SelectField"
-import { Button } from "@/components/ui/button"
 import { signUpWithEmail } from "@/lib/actions/auth.actions"
 import { INVESTMENT_GOALS, PREFERRED_INDUSTRIES, RISK_TOLERANCE_OPTIONS } from "@/lib/constants"
 import { useRouter } from "next/navigation"
@@ -117,9 +117,9 @@ const SignUp = () => {
           error={errors.preferredIndustry}
           required
         />
-        <Button type="submit" disabled={isSubmitting} className="yellow-btn w-full mt-5">
-          {isSubmitting ? 'Creating Account' : 'Start Investing'}
-        </Button>
+        <LoadingButton  isLoading={isSubmitting} loadingText="Creating Account..." className="yellow-btn w-full mt-5">
+          Start Investing
+        </LoadingButton>
         <FooterLink text="Already have an account?" linkText="Sign In" href="/sign-in" />
       </form>
     </>

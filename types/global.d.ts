@@ -216,9 +216,9 @@ declare global {
     threshold: number;
     changePercent?: number;
   };
-  
+
   type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';
-  
+
   type PasswordStrengthResult = {
     strength: PasswordStrength;
     score: number; // 0-4
@@ -234,6 +234,26 @@ declare global {
 
   type PasswordStrengthIndicatorProps = {
     password: string
+  }
+
+  type PasswordInputFieldProps = {
+    name: string
+    label: string
+    placeholder: string
+    register: any
+    error?: any
+    validation?: any
+    disabled?: boolean
+    value?: string
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+  }
+
+  type LoadingButtonProps = {
+    isLoading?: boolean
+    loadingText?: string
+    disabled?: boolean
+    className?: string
+    children?: React.ReactNode
   }
 }
 
