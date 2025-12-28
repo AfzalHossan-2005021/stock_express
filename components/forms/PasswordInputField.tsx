@@ -14,7 +14,6 @@ const PasswordInputField = ({
   error,
   validation,
   disabled = false,
-  value,
   onChange,
 }: PasswordInputFieldProps) => {
   const [showPassword, setShowPassword] = useState(false)
@@ -29,7 +28,6 @@ const PasswordInputField = ({
           placeholder={placeholder}
           disabled={disabled}
           {...register(name, validation)}
-          value={value}
           onChange={(e) => {
             if (onChange) onChange(e)
           }}

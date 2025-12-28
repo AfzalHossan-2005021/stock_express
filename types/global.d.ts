@@ -31,8 +31,8 @@ declare global {
     error?: FieldError;
     validation?: RegisterOptions;
     disabled?: boolean;
-    value?: string;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    inputClassName?: string;
   };
 
   type Option = {
@@ -244,8 +244,8 @@ declare global {
     error?: any
     validation?: any
     disabled?: boolean
-    value?: string
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
+    inputClassName?: string
   }
 
   type LoadingButtonProps = {
