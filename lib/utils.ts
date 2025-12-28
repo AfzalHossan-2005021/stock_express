@@ -38,3 +38,48 @@ export const formatArticle = (
   category: isCompanyNews ? 'company' : article.category || 'general',
   related: isCompanyNews ? symbol! : article.related || '',
 });
+
+export function calculatePasswordStrength(password: string): PasswordStrengthResult {
+  const requirements = {
+    minLength: password.length >= 8,
+    hasUppercase: /[A-Z]/.test(password),
+    hasLowercase: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSpecialChar: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+  };
+
+  const metRequirements = Object.values(requirements).filter(Boolean).length;
+
+  let strength: PasswordStrength = 'weak';
+  let feedback = '';
+
+  if (password.length === 0) {
+    return {
+      strength: 'weak',
+      score: 0,
+      feedback: 'Password is required',
+      requirements,
+    };
+  }
+
+  if (metRequirements <= 1) {
+    strength = 'weak';
+    feedback = 'Very weak password';
+  } else if (metRequirements === 2) {
+    strength = 'fair';
+    feedback = 'Fair password';
+  } else if (metRequirements === 3) {
+    strength = 'good';
+    feedback = 'Good password';
+  } else if (metRequirements >= 4) {
+    strength = 'strong';
+    feedback = 'Strong password';
+  }
+
+  return {
+    strength,
+    score: metRequirements,
+    feedback,
+    requirements,
+  };
+}

@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import CountrySelectField from "@/components/forms/CountrySelectField"
 import FooterLink from "@/components/forms/FooterLink"
 import InputField from "@/components/forms/InputField"
+import PasswordStrengthIndicator from "@/components/forms/PasswordStrengthIndicator"
 import SelectField from "@/components/forms/SelectField"
 import { Button } from "@/components/ui/button"
 import { signUpWithEmail } from "@/lib/actions/auth.actions"
@@ -13,6 +15,7 @@ import { toast } from "sonner"
 
 const SignUp = () => {
   const router = useRouter()
+  const [password, setPassword] = useState('')
   const {
     register,
     handleSubmit,
@@ -83,8 +86,10 @@ const SignUp = () => {
           type="password"
           register={register}
           error={errors.password}
+          onChange={(e) => setPassword(e.target.value)}
           validation={{ required: 'Password is required', minLength: { value: 6, message: 'Password must be at least 6 characters' } }}
         />
+        <PasswordStrengthIndicator password={password} />
         <SelectField
           name="investmentGoals"
           label="Investment Goals"

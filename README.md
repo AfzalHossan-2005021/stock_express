@@ -107,10 +107,6 @@ BETTER_AUTH_URL=http://localhost:3000
 NODEMAILER_EMAIL=your_email@gmail.com
 NODEMAILER_PASSWORD=your_app_password
 
-# Async Tasks
-INNGEST_API_KEY=your_inngest_key
-INNGEST_EVENT_KEY=your_inngest_event_key
-
 # AI (Optional - for personalized emails)
 GEMINI_API_KEY=your_gemini_api_key
 ```
@@ -249,8 +245,6 @@ BETTER_AUTH_SECRET
 BETTER_AUTH_URL
 NODEMAILER_EMAIL
 NODEMAILER_PASSWORD
-INNGEST_API_KEY
-INNGEST_EVENT_KEY
 GEMINI_API_KEY (optional)
 ```
 

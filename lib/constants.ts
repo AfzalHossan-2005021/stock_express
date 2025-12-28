@@ -337,3 +337,30 @@ export const WATCHLIST_TABLE_HEADER = [
 	'Alert',
 	'Action',
 ];
+
+export const PASSWORD_STRENGTH_COLORS: Record<
+	'weak' | 'fair' | 'good' | 'strong', string
+> = {
+	weak: 'bg-red-500',
+	fair: 'bg-yellow-500',
+	good: 'bg-blue-500',
+	strong: 'bg-green-500',
+};
+
+export const PASSWORD_STRENGTH_TEXT_COLORS: Record<
+	'weak' | 'fair' | 'good' | 'strong', string
+> = {
+	weak: 'text-red-500',
+	fair: 'text-yellow-500',
+	good: 'text-blue-500',
+	strong: 'text-green-500',
+};
+
+export const PASSWORD_STRENGTH_BG_COLORS: Record<
+	'weak' | 'fair' | 'good' | 'strong', string
+> = {
+	weak: 'bg-red-50',
+	fair: 'bg-yellow-50',
+	good: 'bg-blue-50',
+	strong: 'bg-green-50',
+};

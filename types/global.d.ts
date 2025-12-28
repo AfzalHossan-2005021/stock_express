@@ -32,6 +32,7 @@ declare global {
     validation?: RegisterOptions;
     disabled?: boolean;
     value?: string;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   };
 
   type Option = {
@@ -215,6 +216,25 @@ declare global {
     threshold: number;
     changePercent?: number;
   };
+  
+  type PasswordStrength = 'weak' | 'fair' | 'good' | 'strong';
+  
+  type PasswordStrengthResult = {
+    strength: PasswordStrength;
+    score: number; // 0-4
+    feedback: string;
+    requirements: {
+      minLength: boolean;
+      hasUppercase: boolean;
+      hasLowercase: boolean;
+      hasNumber: boolean;
+      hasSpecialChar: boolean;
+    };
+  }
+
+  type PasswordStrengthIndicatorProps = {
+    password: string
+  }
 }
 
 export { };
