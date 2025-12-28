@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import SocialAuthButtons from '@/components/forms/SocialAuthButtons'
 
 const SignUp = () => {
   const router = useRouter()
@@ -189,6 +190,7 @@ const SignUp = () => {
               </p>
             </div>
           </form>
+          <SocialAuthButtons />
         </section>
       </div>
     </div>

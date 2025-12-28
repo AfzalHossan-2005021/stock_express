@@ -8,6 +8,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signInWithEmail } from "@/lib/actions/auth.actions"
 import { toast } from "sonner"
+import SocialAuthButtons from "@/components/forms/SocialAuthButtons"
 
 const SignIn = () => {
   const router = useRouter()
@@ -83,6 +84,7 @@ const SignIn = () => {
               </Link>
             </p>
           </div>
+          <SocialAuthButtons />
         </section>
 
         <section className="relative overflow-hidden p-10 md:p-12 flex items-center justify-center bg-gradient-to-br from-purple-500/50 to-purple-500/20">
