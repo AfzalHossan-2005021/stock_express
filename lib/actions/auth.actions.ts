@@ -56,9 +56,19 @@ export const signInWithEmail = async ({ email, password }: SignInFormData) => {
     })
 
     return { success: true, message: 'Sign in successful' };
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error during sign in:', err);
-    return { success: false, message: 'Sign in failed. Please try again.' };
+    
+    // Check for invalid credentials or user not found
+    if (err?.statusCode === 401 || err?.body?.message?.includes('invalid') || err?.body?.message?.includes('Invalid')) {
+      return { success: false, message: 'Invalid email or password. Please check your credentials.' };
+    }
+    
+    if (err?.statusCode === 404 || err?.body?.message?.includes('not found')) {
+      return { success: false, message: 'Account not found. Please sign up first.' };
+    }
+    
+    return { success: false, message: err?.body?.message || 'Sign in failed. Please try again.' };
   }
 }
 
