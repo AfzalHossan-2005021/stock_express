@@ -1,6 +1,7 @@
 'use client'
 
 import InputField from "@/components/forms/InputField"
+import PasswordInputField from "@/components/forms/PasswordInputField"
 import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form"
 import Link from "next/link"
@@ -46,11 +47,10 @@ const SignIn = () => {
           error={errors.email}
           validation={{ required: 'Email is required', pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' } }}
         />
-        <InputField
+        <PasswordInputField
           name="password"
           label="Password"
           placeholder="Enter your password"
-          type="password"
           register={register}
           error={errors.password}
           validation={{ required: 'Password is required', minLength: { value: 6, message: 'Password must be at least 6 characters' } }}

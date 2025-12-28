@@ -4,6 +4,7 @@ import { useState } from 'react'
 import CountrySelectField from "@/components/forms/CountrySelectField"
 import FooterLink from "@/components/forms/FooterLink"
 import InputField from "@/components/forms/InputField"
+import PasswordInputField from "@/components/forms/PasswordInputField"
 import PasswordStrengthIndicator from "@/components/forms/PasswordStrengthIndicator"
 import SelectField from "@/components/forms/SelectField"
 import { Button } from "@/components/ui/button"
@@ -79,11 +80,10 @@ const SignUp = () => {
           error={errors.country}
           required
         />
-        <InputField
+        <PasswordInputField
           name="password"
           label="Password"
           placeholder="Enter your password"
-          type="password"
           register={register}
           error={errors.password}
           onChange={(e) => setPassword(e.target.value)}
