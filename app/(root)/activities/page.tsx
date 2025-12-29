@@ -4,6 +4,14 @@ import { useEffect, useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 type Activity = {
   _id: string;
@@ -19,6 +27,8 @@ export default function ActivitiesPage() {
   const [items, setItems] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activityToDelete, setActivityToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchActivities = async () => {
     try {
@@ -46,21 +56,29 @@ export default function ActivitiesPage() {
     fetchActivities();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Delete this activity? This cannot be undone.')) return;
+  const handleDeleteClick = (id: string) => {
+    setActivityToDelete(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!activityToDelete) return;
+    setIsDeleting(true);
     try {
-      const res = await fetch('/api/stock/activity?id=' + encodeURIComponent(id), {
+      const res = await fetch('/api/stock/activity?id=' + encodeURIComponent(activityToDelete), {
         method: 'DELETE',
       });
       if (!res.ok) {
         const json = await res.json().catch(() => null);
         throw new Error(json?.error || 'Delete failed');
       }
-      setItems((prev) => prev.filter((i) => i._id !== id));
+      setItems((prev) => prev.filter((i) => i._id !== activityToDelete));
       toast.success('Activity deleted');
+      setActivityToDelete(null);
     } catch (err) {
       console.error('Delete activity failed', err);
       toast.error('Failed to delete activity');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -122,7 +140,7 @@ export default function ActivitiesPage() {
                 <td className="px-6 py-4">
                   <div className="flex justify-center gap-2">
                     <button
-                      onClick={() => handleDelete(item._id)}
+                      onClick={() => handleDeleteClick(item._id)}
                       className="p-2 text-red-500 hover:bg-red-500/10 rounded transition-colors"
                       title="Delete activity"
                     >
@@ -137,6 +155,33 @@ export default function ActivitiesPage() {
       </div>
 
       <div className="text-sm text-gray-400 mt-4">Total activities: <span className="font-semibold text-gray-300">{items.length}</span></div>
+
+      <Dialog open={!!activityToDelete} onOpenChange={(open) => !open && setActivityToDelete(null)}>
+        <DialogContent className="border-gray-700 bg-gray-900 sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle className="text-gray-100">Delete Activity</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              Are you sure you want to delete this activity? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 justify-end pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setActivityToDelete(null)}
+              className="text-gray-400 border-gray-600 hover:bg-gray-800"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

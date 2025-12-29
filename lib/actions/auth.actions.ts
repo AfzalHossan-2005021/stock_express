@@ -3,6 +3,7 @@
 import { auth } from "@/lib/better-auth/auth";
 import { inngest } from "@/lib/inngest/client";
 import { headers } from "next/headers";
+import { connectToDatabase } from "@/database/mongoose";
 
 export const signUpWithEmail = async ({ email, password, fullName, country, investmentGoals, riskTolerance, preferredIndustry }: SignUpFormData) => {
   try {
@@ -11,6 +12,24 @@ export const signUpWithEmail = async ({ email, password, fullName, country, inve
     })
 
     if (response) {
+      // Update user with extra fields
+      const mongoose = await connectToDatabase();
+      const db = mongoose.connection.db;
+      
+      if (db) {
+        await db.collection('user').updateOne(
+          { email },
+          { 
+            $set: { 
+              country, 
+              investmentGoals, 
+              riskTolerance, 
+              preferredIndustry 
+            } 
+          }
+        );
+      }
+
       // Fire and forget - don't wait for Inngest response
       inngest.send({
         name: 'app/user.created',
