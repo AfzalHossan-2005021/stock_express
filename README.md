@@ -1,10 +1,23 @@
-# Stock Express 📈
+# 🚀 Stock Express
 
-A modern, real-time stock trading and watchlist management application built with Next.js 16, React 19, and TypeScript. Track your favorite stocks, receive personalized market insights, and stay informed with curated financial news.
+> **Track. Analyze. Prosper.**
+> A modern, real-time stock tracking application for the intelligent investor.
 
-## 🌟 Features
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind-4-cyan?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Green?style=for-the-badge&logo=mongodb&logoColor=white)
 
-### Core Functionality
+---
+
+## 📖 Overview
+
+**Stock Express** is a cutting-edge financial dashboard designed to give you a competitive edge. Built with the latest web technologies, it provides real-time market data, interactive charts, and personalized insights powered by AI. Whether you're a day trader or a long-term investor, Stock Express helps you stay ahead of the curve.
+
+## ✨ Key Features
+
+### 📈 Core Functionality
 - **Stock Search & Discovery** - Search over 10,000+ stocks with real-time market data
 - **Personal Watchlist** - Create and manage your custom watchlist of favorite stocks
 - **Real-Time Charts** - Interactive TradingView charts for technical analysis
@@ -12,15 +25,14 @@ A modern, real-time stock trading and watchlist management application built wit
 - **Stock Heatmap** - Visual representation of market sectors and performance
 - **Market Data** - Live quotes, 52-week highs/lows, and trading volume
 
-### Smart Features
+### 🤖 AI-Powered Intelligence
 - **Personalized Onboarding** - Select investment goals, risk tolerance, and preferred industries
-- **AI-Powered Welcome Emails** - Gemini-powered personalized welcome messages
-- **Personalized Recommendations** - Personalized stock picks surfaced on the dashboard based on your watchlist and activity
-- **Daily News Digest** - Curated market news based on your watchlist (via Inngest)
-- **Company News** - Latest news for stocks in your watchlist
+- **Smart Welcome Emails** - Gemini-powered personalized welcome messages tailored to your profile
+- **Intelligent Recommendations** - AI-driven stock picks surfaced on the dashboard based on your watchlist and activity
+- **Daily News Digest** - Curated market news summaries delivered to your inbox (via Inngest & Gemini)
 - **Smart Search** - Debounced search with autocomplete suggestions
 
-### User Experience
+### 🎨 User Experience
 - **Dark Mode Support** - Modern dark theme with smooth transitions
 - **Responsive Design** - Mobile-first approach with Tailwind CSS
 - **Command Palette** - Quick stock search with Cmd+K
@@ -45,6 +57,7 @@ A modern, real-time stock trading and watchlist management application built wit
 - **Authentication**: Better Auth 1.4
 - **Task Queue**: Inngest 3.48
 - **Email**: Nodemailer 7
+- **AI**: Google Gemini (Generative AI)
 - **External APIs**: Finnhub (stock data)
 
 ### Charts & Widgets
@@ -197,12 +210,12 @@ Tests are configured with Jest and ts-jest. Database tests are in `tests/databas
 
 Comprehensive guides are included:
 
-- **[START_HERE.md](START_HERE.md)** - Quick overview of project analysis and improvements
-- **[PROJECT_ANALYSIS.md](PROJECT_ANALYSIS.md)** - Detailed analysis of 15 improvement areas
-- **[IMPLEMENTATION_GUIDE.ts](IMPLEMENTATION_GUIDE.ts)** - Code examples for fixes
-- **[TESTING_STRATEGY.md](TESTING_STRATEGY.md)** - Complete testing plan
-- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System design and improvements
-- **[DATABASE_TEST_GUIDE.md](DATABASE_TEST_GUIDE.md)** - Guide for setting up database tests
+- **[START_HERE.md](docs/START_HERE.md)** - Quick overview of project analysis and improvements
+- **[PROJECT_ANALYSIS.md](docs/PROJECT_ANALYSIS.md)** - Detailed analysis of 15 improvement areas
+- **[IMPLEMENTATION_GUIDE.ts](docs/IMPLEMENTATION_GUIDE.ts)** - Code examples for fixes
+- **[TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md)** - Complete testing plan
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design and improvements
+- **[DATABASE_TEST_GUIDE.md](docs/DATABASE_TEST_GUIDE.md)** - Guide for setting up database tests
 
 ## 🔒 Security Features
 
