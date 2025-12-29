@@ -173,6 +173,11 @@ stock_express/
 │   ├── models/                   # Mongoose schemas
 │   └── __tests__/                # Database tests
 │
+├── docs/                         # Project documentation
+│   ├── ARCHITECTURE.md           # System design
+│   ├── PROJECT_ANALYSIS.md       # Improvement analysis
+│   └── START_HERE.md             # Quick start guide
+│
 ├── hooks/                        # Custom React hooks
 ├── types/                        # TypeScript type definitions
 ├── middleware/                   # Next.js middleware
@@ -208,11 +213,10 @@ Tests are configured with Jest and ts-jest. Database tests are in `tests/databas
 
 ## 📚 Documentation
 
-Comprehensive guides are included:
+Comprehensive guides are included in the `docs/` folder:
 
 - **[START_HERE.md](docs/START_HERE.md)** - Quick overview of project analysis and improvements
 - **[PROJECT_ANALYSIS.md](docs/PROJECT_ANALYSIS.md)** - Detailed analysis of 15 improvement areas
-- **[IMPLEMENTATION_GUIDE.ts](docs/IMPLEMENTATION_GUIDE.ts)** - Code examples for fixes
 - **[TESTING_STRATEGY.md](docs/TESTING_STRATEGY.md)** - Complete testing plan
 - **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design and improvements
 - **[DATABASE_TEST_GUIDE.md](docs/DATABASE_TEST_GUIDE.md)** - Guide for setting up database tests
@@ -289,14 +293,12 @@ lsof -ti:3000 | xargs kill -9
 
 ## 📊 API Endpoints
 
-### Stock Data (Server-Side Only)
+### Stock Data (Internal API)
 
-- `POST /api/stock/profile` - Get stock profile information
-  ```json
-  {
-    "symbol": "AAPL"
-  }
-  ```
+- `GET /api/stock/activity` - Get recent user activity
+- `POST /api/stock/activity` - Log new activity
+- `DELETE /api/stock/activity` - Delete an activity
+- `GET /api/stock/recommendations` - Get personalized or popular stock recommendations
 
 ### Server Actions
 
@@ -355,8 +357,7 @@ For issues, questions, or suggestions:
 
 ## 🔗 Links
 
-- **Live Demo**: https://stock-express.vercel.app (when deployed)
-- **API Docs**: See [IMPLEMENTATION_GUIDE.ts](IMPLEMENTATION_GUIDE.ts)
+- **Live Demo**: https://stock-express-se.app (when deployed)
 - **Project Board**: GitHub Projects (when set up)
 
 ---
