@@ -197,7 +197,6 @@ export const resetPassword = async ({ token, newPassword, confirmPassword }: { t
     const email = resetTokenDoc.email;
 
     // Update user password in better-auth's database
-    // better-auth stores users in MongoDB, so we can access the connection
     const mongoose = await import('mongoose');
     const db = mongoose.connection.db;
 
@@ -205,89 +204,60 @@ export const resetPassword = async ({ token, newPassword, confirmPassword }: { t
       throw new Error('Database connection not found');
     }
 
-    // Hash the new password using bcrypt
-    const bcrypt = require('bcrypt');
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    console.log('🔍 Searching for user with email:', email);
-
-    // better-auth stores users in 'user' collection and passwords in 'account' collection
-    // First, try to find in account collection (might have email field)
-    let account = await db.collection('account').findOne({ email: email });
-
-    console.log('🔎 Account search by email:', account ? 'FOUND' : 'NOT FOUND');
-
-    if (!account) {
-      // If not found, try to find user and then get their account
-      const user = await db.collection('user').findOne({ email: email });
-      
-      console.log('👤 User found:', user ? 'yes' : 'no');
-
-      if (!user) {
-        // Log all collections to debug
-        const collections = await db.listCollections().toArray();
-        console.log('📚 Available collections:', collections.map(c => c.name));
-        console.log('⚠️  User not found with email:', email);
-        
-        return { success: false, message: 'No account found with this email address. Please sign up first.' };
-      }
-
-      console.log('🔑 User ID:', user._id);
-      console.log('🔐 User document keys:', Object.keys(user));
-
-      // Better-auth stores password in account collection
-      // Let's log the actual account structure
-      const allAccounts = await db.collection('account').find({}).limit(3).toArray();
-      console.log('🔍 Sample accounts:', JSON.stringify(allAccounts, null, 2));
-
-      // Find account by userId
-      let userAccount = await db.collection('account').findOne({ userId: user._id.toString() });
-      
-      if (!userAccount) {
-        // Try with ObjectId format
-        userAccount = await db.collection('account').findOne({ userId: user._id });
-      }
-
-      if (!userAccount) {
-        console.log('❌ No account found for userId, searching all accounts with this user...');
-        const allAccounts2 = await db.collection('account').find({}).toArray();
-        console.log('🔍 All accounts in DB:', JSON.stringify(allAccounts2, null, 2));
-        return { success: false, message: 'User account not found.' };
-      }
-
-      console.log('✅ Found account, updating password...');
-      console.log('📝 Account ID:', userAccount._id);
-      console.log('📝 Account keys:', Object.keys(userAccount));
-
-      // Update the password in the account collection
-      const updateResult = await db.collection('account').updateOne(
-        { _id: userAccount._id },
-        { $set: { password: hashedPassword } }
-      );
-
-      console.log('📝 Password update result:', { matchedCount: updateResult.matchedCount, modifiedCount: updateResult.modifiedCount });
-
-      // Delete the used token
-      const deletedToken = await PasswordResetToken.deleteOne({ _id: resetTokenDoc._id });
-      console.log('🗑️  Token deleted:', deletedToken.deletedCount);
-
-      return { 
-        success: true, 
-        message: 'Password reset successful. Signing you in...',
-        email: email,
-      };
+    // Find user by email
+    const user = await db.collection('user').findOne({ email: email });
+    
+    if (!user) {
+      return { success: false, message: 'User not found.' };
     }
 
-    // If account was found with email field, update it too (just in case)
-    console.log('🔑 Account found with email, updating password...');
-    const result = await db.collection('account').updateOne(
+    // Find the account document linked to this user
+    let account = await db.collection('account').findOne({ userId: user._id.toString() });
+    
+    // Try ObjectId format if string didn't work
+    if (!account) {
+      account = await db.collection('account').findOne({ userId: user._id });
+    }
+
+    if (!account) {
+      return { success: false, message: 'Account not found.' };
+    }
+
+    // Hash password using scrypt (better-auth's algorithm)
+    // Format: salt:hash where both are hex strings
+    // Use @noble/hashes/scrypt exactly like better-auth does
+    const { scryptAsync } = await import('@noble/hashes/scrypt.js');
+    const { bytesToHex } = await import('@noble/hashes/utils.js');
+    const crypto = await import('crypto');
+    
+    // Generate random salt (16 bytes) and convert to hex string
+    const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    const saltHex = bytesToHex(saltBytes);
+    
+    // Use scryptAsync to hash the password with better-auth's parameters
+    // NOTE: Pass the hex string salt directly, just like better-auth does!
+    const key = await scryptAsync(newPassword.normalize('NFKC'), saltHex, {
+      N: 16384,
+      r: 16,
+      p: 1,
+      dkLen: 64,
+      maxmem: 128 * 16384 * 16 * 2,
+    });
+    
+    const keyHex = bytesToHex(key);
+    const hashedPassword = `${saltHex}:${keyHex}`;
+
+    // Update the account password with proper scrypt hash
+    const updateResult = await db.collection('account').updateOne(
       { _id: account._id },
-      { $set: { password: hashedPassword } }
+      { $set: { password: hashedPassword, updatedAt: new Date() } }
     );
 
-    console.log('📝 Account update result:', { matchedCount: result.matchedCount, modifiedCount: result.modifiedCount });
+    if (updateResult.matchedCount === 0) {
+      return { success: false, message: 'Failed to update password.' };
+    }
 
-    // Delete the used token
+    // Delete the used reset token
     await PasswordResetToken.deleteOne({ _id: resetTokenDoc._id });
 
     // Return success with email for client-side signin

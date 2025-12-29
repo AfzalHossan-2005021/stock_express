@@ -167,10 +167,6 @@ const SignUp = () => {
                   required
                 />
 
-                <Button onClick={() => setStage(1)} className="h-12 w-full rounded-lg bg-gradient-to-b from-purple-500/90 to-purple-500/60 hover:from-purple-500 hover:to-purple-500/70 text-white font-medium shadow-lg">
-                  Previous
-                </Button>
-
                 <LoadingButton
                   isLoading={isSubmitting}
                   loadingText="Signing up..."
