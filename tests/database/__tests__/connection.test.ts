@@ -4,7 +4,7 @@
  */
 
 import mongoose from 'mongoose'
-import { connectToDatabase } from '../mongoose'
+import { connectToDatabase } from '../../../database/mongoose'
 
 jest.setTimeout(90000) // Set global timeout for all tests in this suite
 

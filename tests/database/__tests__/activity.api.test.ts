@@ -1,6 +1,6 @@
-import { POST, GET, DELETE } from '../../app/api/stock/activity/route';
+import { POST, GET, DELETE } from '../../../app/api/stock/activity/route';
 
-jest.mock('../../lib/better-auth/auth', () => ({
+jest.mock('../../../lib/better-auth/auth', () => ({
   auth: {
     api: {
       getSession: jest.fn(),
@@ -8,11 +8,11 @@ jest.mock('../../lib/better-auth/auth', () => ({
   },
 }));
 
-jest.mock('../../database/mongoose', () => ({
+jest.mock('../../../database/mongoose', () => ({
   connectToDatabase: jest.fn(async () => ({ connection: { db: {} } })),
 }));
 
-jest.mock('../../database/models/user_activity.model', () => ({
+jest.mock('../../../database/models/user_activity.model', () => ({
   UserActivity: {
     create: jest.fn(async (doc: any) => ({ _id: 'newid', ...doc })),
     find: jest.fn(() => ({
@@ -25,8 +25,8 @@ jest.mock('../../database/models/user_activity.model', () => ({
   },
 }));
 
-const { auth } = require('../../lib/better-auth/auth');
-const { UserActivity } = require('../../database/models/user_activity.model');
+const { auth } = require('../../../lib/better-auth/auth');
+const { UserActivity } = require('../../../database/models/user_activity.model');
 
 describe('activity API', () => {
   afterEach(() => jest.clearAllMocks());

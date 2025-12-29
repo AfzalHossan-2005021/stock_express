@@ -20,7 +20,7 @@ The test suite validates:
 
 ## Test Files
 
-### 1. Connection Tests (`database/__tests__/connection.test.ts`)
+### 1. Connection Tests (`tests/database/__tests__/connection.test.ts`)
 Tests MongoDB connectivity and database configuration.
 
 **Test Cases:**
@@ -36,7 +36,7 @@ Tests MongoDB connectivity and database configuration.
 npm test -- connection.test.ts
 ```
 
-### 2. Operations Tests (`database/__tests__/operations.test.ts`)
+### 2. Operations Tests (`tests/database/__tests__/operations.test.ts`)
 Tests CRUD operations with a test model (TestUser).
 
 **Test Cases:**
@@ -66,7 +66,7 @@ Tests CRUD operations with a test model (TestUser).
 npm test -- operations.test.ts
 ```
 
-### 3. Quick Connection Test (`database/__tests__/quick-test.js`)
+### 3. Quick Connection Test (`tests/database/__tests__/quick-test.js`)
 Standalone Node.js script for quick connection validation without Jest.
 
 **Features:**
@@ -77,7 +77,7 @@ Standalone Node.js script for quick connection validation without Jest.
 
 **Usage:**
 ```bash
-node database/__tests__/quick-test.js
+node tests/database/__tests__/quick-test.js
 ```
 
 or via npm script:
@@ -115,7 +115,7 @@ npm run test:db
 ```
 or
 ```bash
-node database/__tests__/quick-test.js
+node tests/database/__tests__/quick-test.js
 ```
 
 ## Configuration
@@ -129,10 +129,10 @@ NODE_ENV=test
 ### Jest Configuration (`jest.config.js`)
 - **Test Match Pattern:** `**/__tests__/**/*.test.ts`
 - **TypeScript Transform:** `ts-jest`
-- **Global Setup:** `database/__tests__/setup.ts`
+- **Global Setup:** `tests/database/__tests__/setup.ts`
 - **Default Timeout:** 90 seconds (set in connection.test.ts)
 
-### Setup File (`database/__tests__/setup.ts`)
+### Setup File (`tests/database/__tests__/setup.ts`)
 Loads environment variables before tests run:
 ```typescript
 import * as dotenv from 'dotenv';

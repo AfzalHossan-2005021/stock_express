@@ -1,12 +1,12 @@
-jest.mock('../../lib/recommendations', () => ({
+jest.mock('../../../lib/recommendations', () => ({
   clearRecommendationsCacheForUser: jest.fn(),
 }));
 
-jest.mock('../../database/mongoose', () => ({
+jest.mock('../../../database/mongoose', () => ({
   connectToDatabase: jest.fn(async () => ({ connection: { db: {} } })),
 }));
 
-jest.mock('../../database/models/watchlist.model', () => ({
+jest.mock('../../../database/models/watchlist.model', () => ({
   Watchlist: {
     findOne: jest.fn(async () => null),
     create: jest.fn(async () => ({})),
@@ -14,7 +14,7 @@ jest.mock('../../database/models/watchlist.model', () => ({
   },
 }));
 
-jest.mock('../../lib/better-auth/auth', () => ({
+jest.mock('../../../lib/better-auth/auth', () => ({
   auth: {
     api: {
       getSession: jest.fn(async () => ({ user: { id: 'uid', email: 'u@e.com' } })),
@@ -22,8 +22,8 @@ jest.mock('../../lib/better-auth/auth', () => ({
   },
 }));
 
-const { clearRecommendationsCacheForUser } = require('../../lib/recommendations');
-const { addToWatchlist, removeFromWatchlist } = require('../../lib/actions/watchlist.actions');
+const { clearRecommendationsCacheForUser } = require('../../../lib/recommendations');
+const { addToWatchlist, removeFromWatchlist } = require('../../../lib/actions/watchlist.actions');
 
 describe('watchlist recommendation cache hooks', () => {
   afterEach(() => jest.clearAllMocks());

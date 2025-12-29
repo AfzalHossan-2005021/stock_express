@@ -1,11 +1,11 @@
-import { getPopularRecommendations, getPersonalizedRecommendations } from '../../lib/recommendations';
-import { POPULAR_STOCK_SYMBOLS } from '../../lib/constants';
+import { getPopularRecommendations, getPersonalizedRecommendations } from '../../../lib/recommendations';
+import { POPULAR_STOCK_SYMBOLS } from '../../../lib/constants';
 
-jest.mock('../../lib/actions/watchlist.actions', () => ({
+jest.mock('../../../lib/actions/watchlist.actions', () => ({
   getWatchlistSymbolsByEmail: jest.fn(async (email: string) => []),
 }));
 
-jest.mock('../../lib/better-auth/auth', () => ({
+jest.mock('../../../lib/better-auth/auth', () => ({
   auth: {
     api: {
       getSession: jest.fn(),
@@ -13,8 +13,8 @@ jest.mock('../../lib/better-auth/auth', () => ({
   },
 }));
 
-const { auth } = require('../../lib/better-auth/auth');
-const { getWatchlistSymbolsByEmail } = require('../../lib/actions/watchlist.actions');
+const { auth } = require('../../../lib/better-auth/auth');
+const { getWatchlistSymbolsByEmail } = require('../../../lib/actions/watchlist.actions');
 
 describe('recommendations', () => {
   afterEach(() => {

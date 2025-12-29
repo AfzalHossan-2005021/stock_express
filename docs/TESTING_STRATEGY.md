@@ -1,7 +1,7 @@
 # Testing Strategy for Stock Express
 
 ## Current State
-- ✅ Database tests: `/database/__tests__/`
+- ✅ Database tests: `/tests/database/__tests__/`
 - ❌ Server action tests: Missing
 - ❌ Component tests: Missing
 - ❌ API endpoint tests: Missing

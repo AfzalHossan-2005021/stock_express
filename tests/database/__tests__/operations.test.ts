@@ -4,7 +4,7 @@
  */
 
 import mongoose, { Schema, Document } from 'mongoose'
-import { connectToDatabase } from '../mongoose'
+import { connectToDatabase } from '../../../database/mongoose'
 
 // Test model
 interface TestUser extends Document {

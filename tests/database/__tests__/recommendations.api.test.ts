@@ -1,10 +1,10 @@
-import { GET } from '../../app/api/stock/recommendations/route';
+import { GET } from '../../../app/api/stock/recommendations/route';
 
-jest.mock('../../lib/actions/watchlist.actions', () => ({
+jest.mock('../../../lib/actions/watchlist.actions', () => ({
   getWatchlistSymbolsByEmail: jest.fn(async (email: string) => ['AAPL']),
 }));
 
-jest.mock('../../lib/better-auth/auth', () => ({
+jest.mock('../../../lib/better-auth/auth', () => ({
   auth: {
     api: {
       getSession: jest.fn(async (opts: any) => ({ user: { email: 'test@example.com' } })),

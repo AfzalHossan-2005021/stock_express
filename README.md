@@ -191,7 +191,7 @@ npm test:coverage
 
 ### Test Setup
 
-Tests are configured with Jest and ts-jest. Database tests are in `database/__tests__/`.
+Tests are configured with Jest and ts-jest. Database tests are in `tests/database/__tests__/`.
 
 ## 📚 Documentation
 

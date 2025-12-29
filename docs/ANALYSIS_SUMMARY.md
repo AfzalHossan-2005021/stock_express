@@ -47,7 +47,7 @@ I've completed a comprehensive analysis of your Stock Express project. This docu
 ## 🟡 Medium Priority Issues
 
 ### 5. **No Test Coverage** (Except Database)
-- Only `database/__tests__/` has tests
+- Only `tests/database/__tests__/` has tests
 - Missing: API endpoint tests, component tests, server action tests
 - Recommendation: Add >70% coverage
 

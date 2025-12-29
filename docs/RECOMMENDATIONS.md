@@ -52,7 +52,7 @@ Errors:
 - Backend: add `lib/recommendations.ts` implementing scoring & caching, and `app/api/stock/recommendations/route.ts` as the API surface.
 - Models: add `user_activity` collection or `recentViews` field to user profile if needed. Keep schema optional.
 - Frontend: add `components/Recommendations.tsx` and render on the root page or a new `recommendations` section.
-- Tests: add unit tests for scoring (`lib/__tests__/recommendations.test.ts`) and integration tests for the API in `database/__tests__/`.
+- Tests: add unit tests for scoring (`lib/__tests__/recommendations.test.ts`) and integration tests for the API in `tests/database/__tests__/`.
 - Observe existing project patterns (TypeScript, Zod for validation if present, existing auth middleware in `better-auth`).
 
 ## Acceptance criteria
@@ -73,8 +73,8 @@ Implementation file checklist:
 - `app/api/stock/recommendations/route.ts` ✅ (route + auth)
 - `components/Recommendations.tsx` ✅ (UI + skeletons)
 - `lib/__tests__/recommendations.test.ts` ✅ (unit tests)
-- `database/__tests__/recommendations.api.test.ts` ✅ (integration tests)
-- `database/__tests__/watchlist.recommendations.test.ts` ✅ (watchlist cache integration test)
+- `tests/database/__tests__/recommendations.api.test.ts` ✅ (integration tests)
+- `tests/database/__tests__/watchlist.recommendations.test.ts` ✅ (watchlist cache integration test)
 - `docs/RECOMMENDATIONS.md` ✅ (this file)
 
 ## Implementation notes

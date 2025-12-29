@@ -5,7 +5,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/database', '<rootDir>/lib'],
+  roots: ['<rootDir>/tests', '<rootDir>/lib'],
   testMatch: ['**/__tests__/**/*.test.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1'
@@ -13,9 +13,8 @@ module.exports = {
   collectCoverageFrom: [
     'database/**/*.ts',
     '!database/**/*.test.ts',
-    '!database/__tests__/**',
   ],
-  setupFilesAfterEnv: ['<rootDir>/database/__tests__/setup.ts'],
+  setupFilesAfterEnv: ['<rootDir>/tests/database/__tests__/setup.ts'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: {
