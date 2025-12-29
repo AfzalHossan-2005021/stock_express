@@ -16,15 +16,19 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import SocialAuthButtons from '@/components/forms/SocialAuthButtons'
 
+const INPUT_CLASS_NAME = "bg-transparent rounded-none border-x-0 border-t-0 border-b border-gray-600 focus:!border-purple-500 text-white placeholder:text-gray-500"
+const BUTTON_CLASS_NAME = "h-12 w-full rounded-lg bg-gradient-to-b from-purple-500/90 to-purple-500/60 hover:from-purple-500 hover:to-purple-500/70 text-white font-medium shadow-lg"
+
 const SignUp = () => {
   const router = useRouter()
   const [stage, setStage] = useState(1)
-  const [password, setPassword] = useState('')
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors, isSubmitting, touchedFields, dirtyFields },
+    trigger,
+    watch,
+    formState: { errors, isSubmitting },
   } = useForm<SignUpFormData>({
     defaultValues: {
       fullName: '',
@@ -38,10 +42,13 @@ const SignUp = () => {
     mode: 'onBlur',
   })
 
+  const password = watch('password', '')
+
   const onSubmit = async (data: SignUpFormData) => {
     try {
       const result = await signUpWithEmail(data)
       if (result.success) {
+        toast.success('Account created! Redirecting...')
         router.push('/')
       } else if (result.shouldRedirect) {
         // Redirect to sign-in if user already exists
@@ -56,6 +63,16 @@ const SignUp = () => {
     }
   }
 
+  const handleNext = async () => {
+    if (isSubmitting) return
+    const valid = await trigger(['fullName', 'email', 'password'])
+    if (!valid) {
+      toast.error('Please fix the errors in the form before proceeding.')
+      return
+    }
+    setStage(2)
+  }
+
   return (
     <div className="relative overflow-hidden rounded-2xl border border-purple-500/30 bg-gray-800/30 shadow-2xl">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-purple-500/10" />
@@ -64,7 +81,7 @@ const SignUp = () => {
         <section className="relative overflow-hidden p-10 md:p-12 flex items-center justify-center bg-gradient-to-br from-purple-500/50 to-purple-500/20 md:order-1 order-1">
           <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gray-900/90 skew-x-12 origin-top" />
           <div className="relative text-center">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-white">WELCOME BACK!</h2>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-white">Create your account</h2>
             <p className="mt-3 text-sm text-gray-200/90 max-w-xs mx-auto">
               Create your account to personalize your investing experience.
             </p>
@@ -81,10 +98,11 @@ const SignUp = () => {
                 <InputField
                   name="fullName"
                   label="Full Name"
-                  placeholder="Username"
+                  placeholder="Full name"
                   register={register}
                   error={errors.fullName}
-                  inputClassName="bg-transparent rounded-none border-x-0 border-t-0 border-b border-gray-600 focus:!border-purple-500 text-white placeholder:text-gray-500"
+                  autoComplete="name"
+                  inputClassName={INPUT_CLASS_NAME}
                   validation={{ required: 'Full Name is required', minLength: { value: 2, message: 'Full Name must be at least 2 characters' } }}
                 />
 
@@ -94,7 +112,8 @@ const SignUp = () => {
                   placeholder="Email"
                   register={register}
                   error={errors.email}
-                  inputClassName="bg-transparent rounded-none border-x-0 border-t-0 border-b border-gray-600 focus:!border-purple-500 text-white placeholder:text-gray-500"
+                  autoComplete="email"
+                  inputClassName={INPUT_CLASS_NAME}
                   validation={{ required: 'Email is required', minLength: { value: 2, message: 'Email must be at least 2 characters' }, pattern: { value: /^\S+@\S+$/i, message: 'Invalid email address' } }}
                 />
 
@@ -104,26 +123,18 @@ const SignUp = () => {
                   placeholder="Password"
                   register={register}
                   error={errors.password}
-                  inputClassName="bg-transparent rounded-none border-x-0 border-t-0 border-b border-gray-600 focus:!border-purple-500 text-white placeholder:text-gray-500"
-                  onChange={(e) => setPassword(e.target.value)}
+                  inputClassName={INPUT_CLASS_NAME}
+                  autoComplete="new-password"
                   validation={{ required: 'Password is required', minLength: { value: 8, message: 'Password must be at least 8 characters' } }}
                 />
 
                 <PasswordStrengthIndicator password={password} />
 
-                <Button 
-                  onClick={() => {
-                    if (!dirtyFields.fullName || !dirtyFields.email || !dirtyFields.password) {
-                      toast.error('Please fill out all required fields before proceeding.')
-                      return
-                    }
-                    if (errors.fullName || errors.email || errors.password) {
-                      toast.error('Please fix the errors in the form before proceeding.')
-                      return
-                    }
-                    setStage(2)
-                  }}
-                  className="h-12 w-full rounded-lg bg-gradient-to-b from-purple-500/90 to-purple-500/60 hover:from-purple-500 hover:to-purple-500/70 text-white font-medium shadow-lg">
+                <Button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={isSubmitting}
+                  className={BUTTON_CLASS_NAME}>
                   Next
                 </Button>
               </>
@@ -167,10 +178,14 @@ const SignUp = () => {
                   required
                 />
 
+                <Button type="button" onClick={() => setStage(1)} disabled={isSubmitting} className={BUTTON_CLASS_NAME}>
+                  Previous
+                </Button>
+
                 <LoadingButton
                   isLoading={isSubmitting}
                   loadingText="Signing up..."
-                  className="h-12 w-full rounded-lg bg-gradient-to-b from-purple-500/90 to-purple-500/60 hover:from-purple-500 hover:to-purple-500/70 text-white font-medium shadow-lg"
+                  className={BUTTON_CLASS_NAME}
                 >
                   Sign Up
                 </LoadingButton>

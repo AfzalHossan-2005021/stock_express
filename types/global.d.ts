@@ -33,6 +33,7 @@ declare global {
     disabled?: boolean;
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
     inputClassName?: string;
+    autoComplete?: string;
   };
 
   type Option = {
@@ -246,6 +247,7 @@ declare global {
     disabled?: boolean
     onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
     inputClassName?: string
+    autoComplete?: string
   }
 
   type LoadingButtonProps = {
