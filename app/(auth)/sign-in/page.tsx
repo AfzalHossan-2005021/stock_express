@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import InputField from "@/components/forms/InputField"
 import LoadingButton from "@/components/forms/LoadingButton"
 import PasswordInputField from "@/components/forms/PasswordInputField"
+import ForgotPasswordDialog from "@/components/ForgotPasswordDialog"
 import { useForm } from "react-hook-form"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -12,6 +14,7 @@ import SocialAuthButtons from "@/components/forms/SocialAuthButtons"
 
 const SignIn = () => {
   const router = useRouter()
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
   const {
     register,
     handleSubmit,
@@ -67,6 +70,16 @@ const SignIn = () => {
               validation={{ required: 'Password is required', minLength: { value: 6, message: 'Password must be at least 6 characters' } }}
             />
 
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm text-purple-500 hover:text-purple-400 transition-colors"
+              >
+                Forgot password?
+              </button>
+            </div>
+
             <LoadingButton
               isLoading={isSubmitting}
               loadingText="Logging in..."
@@ -97,6 +110,8 @@ const SignIn = () => {
           </div>
         </section>
       </div>
+
+      <ForgotPasswordDialog open={showForgotPassword} onOpenChange={setShowForgotPassword} />
     </div>
   )
 }

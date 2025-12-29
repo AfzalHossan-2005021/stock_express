@@ -52,10 +52,9 @@ const UserDropdown = ({ user, initialStocks }: { user: User, initialStocks: Stoc
 		router.push('/personalize');
 	}
 
-	const handleUpdatePassword = async (data: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+	const handleUpdatePassword = async (data: { newPassword: string; confirmPassword: string }) => {
 		try {
 			const result = await updatePassword({
-				currentPassword: data.currentPassword,
 				newPassword: data.newPassword,
 				confirmPassword: data.confirmPassword,
 			});

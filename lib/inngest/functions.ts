@@ -1,6 +1,6 @@
 import { inngest } from "@/lib/inngest/client";
 import { NEWS_SUMMARY_EMAIL_PROMPT, PERSONALIZED_WELCOME_EMAIL_PROMPT } from "@/lib/inngest/prompts";
-import { sendNewsSummaryEmail, sendWelcomeEmail } from "@/lib/nodemailer";
+import { sendNewsSummaryEmail, sendWelcomeEmail, sendPasswordResetEmail } from "@/lib/nodemailer";
 import { getAllUsersForNewsEmail } from "@/lib/actions/user.actions";
 import { getWatchlistSymbolsByEmail } from "@/lib/actions/watchlist.actions";
 import { getNews } from "@/lib/actions/finnhub.actions";
@@ -118,3 +118,20 @@ export const sendDailyNewsSummary = inngest.createFunction(
     return { success: true, message: 'Daily news summary emails sent successfully' }
   }
 )
+
+export const sendPasswordResetEmailFunction = inngest.createFunction(
+  { id: "password_reset_email" },
+  { event: 'app/password.reset.requested' },
+  async ({ event, step }) => {
+    const { email, resetLink } = event.data;
+
+    await step.run('send-password-reset-email', async () => {
+      return await sendPasswordResetEmail({ email, resetLink })
+    });
+
+    return {
+      success: true,
+      message: 'Password reset email sent successfully'
+    }
+  }
+);
