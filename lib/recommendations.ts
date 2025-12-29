@@ -83,6 +83,26 @@ export async function getPersonalizedRecommendations(limit = 10): Promise<Recomm
 
   const total = POPULAR_STOCK_SYMBOLS.length;
 
+  // Pull recent user activity (views / clicks) to boost relevance
+  let recentSymbols: string[] = [];
+  try {
+    const { getRecentActivitiesByUserId } = await import('./actions/activity.actions');
+    const activities = await getRecentActivitiesByUserId(session.user.id, 30, 100);
+    // extract unique symbols preserving order
+    const seen = new Set<string>();
+    recentSymbols = activities
+      .map((a: any) => String(a.symbol || '').toUpperCase())
+      .filter((s: string) => Boolean(s))
+      .filter((s: string) => {
+        if (seen.has(s)) return false;
+        seen.add(s);
+        return true;
+      });
+  } catch (e) {
+    // Non-fatal: fall back if activity isn't available
+    recentSymbols = [];
+  }
+
   const scored = candidates.map((sym, idx) => {
     const popScore = popularityScoreFromRank(idx, total);
 
@@ -93,10 +113,20 @@ export async function getPersonalizedRecommendations(limit = 10): Promise<Recomm
       affinityBoost = 0.15;
     }
 
-    const score = Math.max(0, Math.min(1, popScore * 0.8 + affinityBoost));
+    // recency boost based on recent activity (top recent gets larger boost)
+    let recencyBoost = 0;
+    const pos = recentSymbols.indexOf(sym);
+    if (pos >= 0) {
+      // normalized: top recent gets 0.25, later ones less
+      const max = Math.max(1, recentSymbols.length);
+      recencyBoost = 0.25 * (1 - pos / max);
+    }
 
-    const reasons = ['Popular among users'];
+    let score = Math.max(0, Math.min(1, popScore * 0.7 + affinityBoost + recencyBoost));
+
+    const reasons: string[] = ['Popular among users'];
     if (affinityBoost > 0) reasons.push('Related to your watchlist');
+    if (recencyBoost > 0) reasons.push('Recently viewed');
 
     const r: Recommendation = { symbol: sym, score, reasons };
     return r;

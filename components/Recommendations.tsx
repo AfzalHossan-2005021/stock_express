@@ -37,7 +37,18 @@ const Recommendations = () => {
         const res = await fetch('/api/stock/recommendations?limit=6');
         if (!res.ok) throw new Error('Failed to fetch');
         const json = await res.json();
-        if (mounted) setItems(json?.data || []);
+        if (mounted) {
+          setItems(json?.data || []);
+          // Record impressions for top recommendations (best-effort)
+          try {
+            const { recordActivity } = await import('@/lib/actions/activity.actions');
+            (json?.data || []).slice(0, 3).forEach((rec: any) => {
+              void recordActivity({ type: 'impression', symbol: rec.symbol, meta: { source: 'recommendations' } });
+            });
+          } catch (e) {
+            // ignore
+          }
+        }
       } catch (e: any) {
         console.error('Recommendations fetch error', e);
         if (mounted) setError('Failed to load recommendations');
@@ -104,7 +115,18 @@ const Recommendations = () => {
           return (
             <li key={rec.symbol} className="flex items-center justify-between gap-3">
               <div>
-                <Link href={`/stocks/${rec.symbol}`} className="font-semibold text-yellow-500 hover:text-yellow-400">
+                <Link
+                  href={`/stocks/${rec.symbol}`}
+                  className="font-semibold text-yellow-500 hover:text-yellow-400"
+                  onClick={async () => {
+                    try {
+                      const { recordActivity } = await import('@/lib/actions/activity.actions');
+                      void recordActivity({ type: 'click', symbol: rec.symbol, meta: { source: 'recommendations' } });
+                    } catch (e) {
+                      // ignore
+                    }
+                  }}
+                >
                   {rec.symbol}
                 </Link>
                 <div className="text-xs text-gray-400">{rec.reasons?.slice(0, 2).join(' • ')}</div>

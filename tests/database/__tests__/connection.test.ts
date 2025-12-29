@@ -60,7 +60,10 @@ describe('Database Connection Tests', () => {
     })
 
     test('should be able to ping database', async () => {
-      const adminDb = mongoose.connection.db.admin()
+      const db = mongoose.connection.db
+      expect(db).toBeDefined()
+      // db is asserted non-null after the runtime check
+      const adminDb = db!.admin()
       const pingResult = await adminDb.ping()
       expect(pingResult).toHaveProperty('ok', 1)
     })

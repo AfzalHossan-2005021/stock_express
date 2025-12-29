@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+npm-debug.log
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Environment files (don't include in image)
+.env
+.env.local
+.env.*.local
+
+# Development
+.DS_Store
+*.pem
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.circleci/
+
+# Other
+Dockerfile
+docker-compose*.yml
+.dockerignore

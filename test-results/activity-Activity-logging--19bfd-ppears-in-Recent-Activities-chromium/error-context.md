@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e5]:
+      - generic [ref=e6]:
+        - heading "Login" [level=1] [ref=e7]
+        - paragraph [ref=e8]: Sign in to continue.
+        - generic [ref=e9]:
+          - generic [ref=e10]:
+            - generic [ref=e11]: Email
+            - textbox "Email" [ref=e12]
+          - generic [ref=e13]:
+            - generic [ref=e14]: Password
+            - generic [ref=e15]:
+              - textbox "Password" [ref=e16]
+              - button "Show password" [ref=e17]:
+                - img [ref=e18]
+          - button "Login" [ref=e21]:
+            - generic [ref=e22]: Login
+        - paragraph [ref=e24]:
+          - text: Don't have an account?
+          - link "Sign Up" [ref=e25] [cursor=pointer]:
+            - /url: /sign-up
+        - generic [ref=e26]:
+          - generic [ref=e31]: Or continue with
+          - generic [ref=e32]:
+            - button "Google" [ref=e33]:
+              - img
+              - generic [ref=e34]: Google
+            - button "GitHub" [ref=e35]:
+              - img
+              - generic [ref=e36]: GitHub
+      - generic [ref=e38]:
+        - heading "WELCOME BACK!" [level=2] [ref=e39]
+        - paragraph [ref=e40]: Track stocks, manage your watchlist, and stay on top of the market.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e46] [cursor=pointer]:
+    - img [ref=e47]
+  - alert [ref=e50]
+```

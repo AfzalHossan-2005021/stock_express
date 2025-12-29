@@ -1,0 +1,105 @@
+version: '3.8'
+
+# Development Docker Compose Configuration
+# Use: docker-compose -f docker-compose.dev.yml up
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    
+    environment:
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongodb:27017/stock_express
+      NEXT_PUBLIC_BASIC_URI: http://localhost:3000
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: http://localhost:3000
+      FINNHUB_API_KEY: ${FINNHUB_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      NODEMAILER_EMAIL: ${NODEMAILER_EMAIL}
+      NODEMAILER_PASSWORD: ${NODEMAILER_PASSWORD}
+      INNGEST_DEV: "1"
+      INNGEST_BASE_URL: http://inngest:8288
+    
+    volumes:
+      # Hot reload for development
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    
+    networks:
+      - stock_express_network
+    
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    
+    environment:
+      MONGO_INITDB_DATABASE: stock_express
+    
+    volumes:
+      - mongodb_data_dev:/data/db
+      - mongodb_config_dev:/data/configdb
+    
+    networks:
+      - stock_express_network
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Optional: Mongo Express for MongoDB GUI
+  mongo-express:
+    image: mongo-express:latest
+    ports:
+      - "8081:8081"
+    
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/stock_express
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: pass
+    
+    depends_on:
+      - mongodb
+    
+    networks:
+      - stock_express_network
+    
+    restart: unless-stopped
+
+  # Inngest Dev Server for background job management
+  inngest:
+    image: inngest/inngest:latest
+    command: inngest dev -u http://app:3000/api/inngest
+    ports:
+      - "8288:8288"
+    
+    networks:
+      - stock_express_network
+    
+    depends_on:
+      - app
+    
+    restart: unless-stopped
+
+volumes:
+  mongodb_data_dev:
+  mongodb_config_dev:
+
+networks:
+  stock_express_network:
+    driver: bridge

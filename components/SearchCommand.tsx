@@ -71,6 +71,14 @@ export const SearchCommand = ({ renderAs = 'button', label = 'Add stock', initia
         })
       );
       setStocks(resultsWithStatus);
+
+      // Record search activity (best-effort)
+      try {
+        const { recordActivity } = await import('@/lib/actions/activity.actions');
+        void recordActivity({ type: 'search', meta: { query: searchTerm, results: resultsWithStatus.length } });
+      } catch (e) {
+        // non-fatal
+      }
     } catch (error) {
       console.error('Error searching stocks:', error);
       setStocks([]);

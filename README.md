@@ -15,6 +15,7 @@ A modern, real-time stock trading and watchlist management application built wit
 ### Smart Features
 - **Personalized Onboarding** - Select investment goals, risk tolerance, and preferred industries
 - **AI-Powered Welcome Emails** - Gemini-powered personalized welcome messages
+- **Personalized Recommendations** - Personalized stock picks surfaced on the dashboard based on your watchlist and activity
 - **Daily News Digest** - Curated market news based on your watchlist (via Inngest)
 - **Company News** - Latest news for stocks in your watchlist
 - **Smart Search** - Debounced search with autocomplete suggestions

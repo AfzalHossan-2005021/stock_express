@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Node environment
+      NODE_ENV: production
+      
+      # Database
+      MONGODB_URI: mongodb://mongodb:27017/stock_express
+      
+      # Next.js
+      NEXT_PUBLIC_BASIC_URI: http://localhost:3000
+      
+      # Authentication
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: http://localhost:3000
+      
+      # APIs
+      FINNHUB_API_KEY: ${FINNHUB_API_KEY}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      
+      # Email
+      NODEMAILER_EMAIL: ${NODEMAILER_EMAIL}
+      NODEMAILER_PASSWORD: ${NODEMAILER_PASSWORD}
+      
+      # Inngest
+      INNGEST_API_KEY: ${INNGEST_API_KEY}
+      INNGEST_EVENT_KEY: ${INNGEST_EVENT_KEY}
+    
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    
+    networks:
+      - stock_express_network
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    
+    environment:
+      # Optional: Set MongoDB username/password (uncomment if using authentication)
+      # MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      # MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: stock_express
+    
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    
+    networks:
+      - stock_express_network
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+networks:
+  stock_express_network:
+    driver: bridge
