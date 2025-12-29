@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -19,16 +20,28 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useRouter } from "next/navigation"
 import { Button } from "./ui/button";
-import { LogOut, Settings, Trash2 } from "lucide-react";
+import { LogOut, Settings, Trash2, Lock } from "lucide-react";
 import NavItems from "./NavItems";
-import { signOut } from "@/lib/actions/auth.actions";
+import PasswordInputField from "./forms/PasswordInputField"
+import { signOut, updatePassword } from "@/lib/actions/auth.actions";
 import { deleteUserAccount } from "@/lib/actions/user.actions";
 import { toast } from "sonner";
 
 const UserDropdown = ({ user, initialStocks }: { user: User, initialStocks: StockWithWatchlistStatus[] }) => {
 	const router = useRouter();
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+	const [showUpdatePasswordDialog, setShowUpdatePasswordDialog] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
+	
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting },
+		reset,
+		getValues,
+	} = useForm<{ currentPassword: string; newPassword: string; confirmPassword: string }>({
+		mode: 'onBlur',
+	})
 
 	const handleSignOut = async () => {
 		await signOut();
@@ -37,6 +50,27 @@ const UserDropdown = ({ user, initialStocks }: { user: User, initialStocks: Stoc
 
 	const handleUpdatePreferences = () => {
 		router.push('/personalize');
+	}
+
+	const handleUpdatePassword = async (data: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+		try {
+			const result = await updatePassword({
+				currentPassword: data.currentPassword,
+				newPassword: data.newPassword,
+				confirmPassword: data.confirmPassword,
+			});
+
+			if (result.success) {
+				toast.success('Password updated', { description: 'Your password has been updated successfully.' });
+				reset();
+				setShowUpdatePasswordDialog(false);
+			} else {
+				toast.error('Update failed', { description: result.message || 'Failed to update password.' });
+			}
+		} catch (error) {
+			console.error('Error updating password:', error);
+			toast.error('Update failed', { description: 'An unexpected error occurred.' });
+		}
 	}
 
 	const handleDeleteAccount = async () => {
@@ -97,6 +131,10 @@ const UserDropdown = ({ user, initialStocks }: { user: User, initialStocks: Stoc
 					<Settings className="h-4 w-4 mr-2 hidden sm:block" />
 					Update Preferences
 				</DropdownMenuItem>
+				<DropdownMenuItem onClick={() => setShowUpdatePasswordDialog(true)} className="text-gray-100 text-md font-medium focus:bg-transparent focus:text-yellow-500 transition-colors cursor-pointer">
+					<Lock className="h-4 w-4 mr-2 hidden sm:block" />
+					Update Password
+				</DropdownMenuItem>
 				<DropdownMenuItem onClick={handleSignOut} className="text-gray-100 text-md font-medium focus:bg-transparent focus:text-yellow-500 transition-colors cursor-pointer">
 					<LogOut className="h-4 w-4 mr-2 hidden sm:block" />
 					Sign Out
@@ -112,6 +150,61 @@ const UserDropdown = ({ user, initialStocks }: { user: User, initialStocks: Stoc
 				</nav>
 				</DropdownMenuContent>
 			</DropdownMenu>
+
+			<Dialog open={showUpdatePasswordDialog} onOpenChange={setShowUpdatePasswordDialog}>
+				<DialogContent className="border-gray-700 bg-gray-900 sm:max-w-[400px]">
+					<DialogHeader>
+						<DialogTitle className="text-gray-100">Update Password</DialogTitle>
+						<DialogDescription className="text-gray-400">
+							Enter your current password and a new password below. Password must be at least 8 characters long.
+						</DialogDescription>
+					</DialogHeader>
+
+					<form onSubmit={handleSubmit(handleUpdatePassword)} className="space-y-4">
+						<PasswordInputField
+							name="newPassword"
+							label="New Password"
+							placeholder="Enter new password"
+							register={register}
+							error={errors.newPassword}
+							validation={{
+								required: 'Password is required',
+								minLength: { value: 8, message: 'Password must be at least 8 characters' },
+								maxLength: { value: 128, message: 'Password must be no more than 128 characters' },
+							}}
+						/>
+						<PasswordInputField
+							name="confirmPassword"
+							label="Confirm Password"
+							placeholder="Confirm your password"
+							register={register}
+							error={errors.confirmPassword}
+							validation={{
+								required: 'Please confirm your password',
+								validate: (value: string) =>
+									value === getValues('newPassword') || 'Passwords do not match',
+							}}
+						/>
+						<div className="flex gap-3 justify-end pt-4">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => setShowUpdatePasswordDialog(false)}
+								className="text-gray-400 border-gray-600 hover:bg-gray-800"
+							>
+								Cancel
+							</Button>
+							<Button
+								type="submit"
+								disabled={isSubmitting}
+								className="bg-yellow-500 hover:bg-yellow-600 text-gray-900"
+							>
+								{isSubmitting ? 'Updating...' : 'Update'}
+							</Button>
+						</div>
+					</form>
+				</DialogContent>
+			</Dialog>
 
 			<Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
 				<DialogContent className="border-gray-700 bg-gray-900 sm:max-w-[400px]">

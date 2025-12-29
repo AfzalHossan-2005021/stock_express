@@ -72,3 +72,38 @@ export const signInWithEmail = async ({ email, password }: SignInFormData) => {
   }
 }
 
+export const updatePassword = async ({ currentPassword, newPassword, confirmPassword }: { currentPassword: string; newPassword: string; confirmPassword: string }) => {
+  try {
+    if (!currentPassword) {
+      return { success: false, message: 'Current password is required.' };
+    }
+
+    // Validate password match
+    if (newPassword !== confirmPassword) {
+      return { success: false, message: 'Passwords do not match.' };
+    }
+
+    // Validate password length
+    if (newPassword.length < 8) {
+      return { success: false, message: 'Password must be at least 8 characters long.' };
+    }
+
+    if (newPassword.length > 128) {
+      return { success: false, message: 'Password must be no more than 128 characters long.' };
+    }
+
+    await auth.api.changePassword({
+      body: {
+        currentPassword,
+        newPassword,
+      },
+      headers: await headers(),
+    });
+
+    return { success: true, message: 'Password updated successfully.' };
+  } catch (err: any) {
+    console.error('Error updating password:', err);
+    return { success: false, message: err?.body?.message || 'Failed to update password. Please try again.' };
+  }
+}
+
