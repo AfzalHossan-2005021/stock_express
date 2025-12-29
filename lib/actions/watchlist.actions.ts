@@ -1,11 +1,11 @@
 'use server';
 
-import { connectToDatabase } from '@/database/mongoose';
-import { Watchlist } from '@/database/models/watchlist.model';
-import { auth } from '@/lib/better-auth/auth';
+import { connectToDatabase } from '../../database/mongoose';
+import { Watchlist } from '../../database/models/watchlist.model';
+import { auth } from '../better-auth/auth';
 import { headers } from 'next/headers';
-import { getStockProfile2 } from '@/lib/actions/finnhub.actions';
-import { buildTradingViewSymbol, mapFinnhubExchangeToTradingView } from '@/lib/tradingview';
+import { getStockProfile2 } from './finnhub.actions';
+import { buildTradingViewSymbol, mapFinnhubExchangeToTradingView } from '../tradingview';
 
 export async function getWatchlistSymbolsByEmail(email: string): Promise<string[]> {
   if (!email) return [];
@@ -32,7 +32,15 @@ export async function getWatchlistSymbolsByEmail(email: string): Promise<string[
 }
 
 async function getCurrentUser() {
-  const session = await auth.api.getSession({ headers: await headers() });
+  // Try to call with headers in request context, otherwise fall back to headers-less call (for tests and non-request contexts)
+  let session: any = null;
+  try {
+    session = await auth.api.getSession({ headers: await headers() });
+  } catch (e) {
+    // Fall back to an empty Headers instance to satisfy the API typing that requires headers.
+    session = await auth.api.getSession({ headers: new Headers() }).catch(() => null);
+  }
+
   if (!session?.user) {
     throw new Error('Not authenticated');
   }
@@ -77,6 +85,15 @@ export async function addToWatchlist(
       tvSymbol: cleanTvSymbol,
     });
 
+    // Clear recommendation cache for this user so recommendations refresh
+    try {
+      const { clearRecommendationsCacheForUser } = await import('../recommendations');
+      if (typeof user?.email === 'string') await clearRecommendationsCacheForUser(user.email);
+    } catch (e) {
+      // Non-fatal - don't block the main flow
+      console.warn('Failed to clear recommendation cache for user', e);
+    }
+
     return { success: true, message: 'Added to watchlist' };
   } catch (err) {
     console.error('addToWatchlist error:', err);
@@ -101,6 +118,14 @@ export async function removeFromWatchlist(symbol: string): Promise<{ success: bo
 
     if (result.deletedCount === 0) {
       return { success: false, message: 'Not found in watchlist' };
+    }
+
+    // Clear recommendation cache for this user so recommendations refresh
+    try {
+      const { clearRecommendationsCacheForUser } = await import('../recommendations');
+      if (typeof user?.email === 'string') await clearRecommendationsCacheForUser(user.email);
+    } catch (e) {
+      console.warn('Failed to clear recommendation cache for user', e);
     }
 
     return { success: true, message: 'Removed from watchlist' };

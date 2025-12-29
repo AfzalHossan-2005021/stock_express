@@ -5,8 +5,11 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/database'],
+  roots: ['<rootDir>/database', '<rootDir>/lib'],
   testMatch: ['**/__tests__/**/*.test.ts'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/$1'
+  },
   collectCoverageFrom: [
     'database/**/*.ts',
     '!database/**/*.test.ts',
