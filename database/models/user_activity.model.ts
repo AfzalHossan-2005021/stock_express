@@ -18,7 +18,7 @@ const UserActivitySchema = new Schema<IUserActivity>(
     type: { type: String, required: true, enum: ['view', 'search', 'click', 'impression'] },
     symbol: { type: String, required: false, uppercase: true, trim: true },
     meta: { type: Schema.Types.Mixed, required: false },
-    createdAt: { type: Date, default: Date.now, index: true },
+    createdAt: { type: Date, default: Date.now },
   },
   { timestamps: false }
 );

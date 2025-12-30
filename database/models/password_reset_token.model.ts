@@ -11,7 +11,7 @@ const PasswordResetTokenSchema = new Schema<IPasswordResetToken>(
   {
     token: { type: String, required: true, unique: true, index: true },
     email: { type: String, required: true, index: true },
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: false }
